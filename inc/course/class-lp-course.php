@@ -531,7 +531,7 @@ if ( ! class_exists( 'LP_Course' ) ) {
 							$filter_tmp = LP_Course_DB::getInstance()->get_courses_sort_by_popular( $filter_tmp );
 							break;
 						default:
-							$filter_tmp = apply_filters( 'lp/courses/filter/sort_by' . $sort_by, $filter_tmp );
+							$filter_tmp = apply_filters( 'lp/courses/filter/sort_by/' . $sort_by, $filter_tmp );
 							break;
 					}
 

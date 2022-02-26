@@ -492,8 +492,9 @@ class LP_Course_DB extends LP_Database {
 		}
 
 		// Author
-		if ( $filter->post_author ) {
-			$WHERE[] = $this->wpdb->prepare( 'AND p.post_author = %d', $filter->post_author );
+		if ( ! empty( $filter->post_author ) ) {
+			$list_author_format = LP_Helper::db_format_array( $filter->post_author, '%d' );
+			$WHERE[]            = $this->wpdb->prepare( 'AND p.post_author IN (' . $list_author_format . ')', $filter->post_author );
 		}
 
 		// Fields select

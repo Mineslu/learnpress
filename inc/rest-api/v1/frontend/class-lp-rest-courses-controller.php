@@ -120,8 +120,14 @@ class LP_REST_Courses_Controller extends LP_Abstract_REST_Controller {
 				$fields         = explode( ',', $fields_str );
 				$filter->fields = $fields;
 			}
-			$filter->post_author = LP_Helper::sanitize_params_submitted( $request['c_author'] ?? 0 );
-			$term_ids_str        = LP_Helper::sanitize_params_submitted( $request['term_id'] ?? '' );
+
+			$author_ids_str = LP_Helper::sanitize_params_submitted( $request['c_author'] ?? '' );
+			if ( ! empty( $author_ids_str ) ) {
+				$author_ids          = explode( ',', $author_ids_str );
+				$filter->post_author = $author_ids;
+			}
+
+			$term_ids_str = LP_Helper::sanitize_params_submitted( $request['term_id'] ?? '' );
 			if ( ! empty( $term_ids_str ) ) {
 				$term_ids         = explode( ',', $term_ids_str );
 				$filter->term_ids = $term_ids;
@@ -448,7 +454,8 @@ class LP_REST_Courses_Controller extends LP_Abstract_REST_Controller {
 			}
 
 			// Allow Repurchase.
-			/*$latest_user_item_id = $wpdb->get_var(
+			/*
+			$latest_user_item_id = $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT MAX(user_item_id) user_item_id
 					FROM {$wpdb->learnpress_user_items}
