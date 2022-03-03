@@ -49,7 +49,7 @@ class LP_REST_Courses_Controller extends LP_Abstract_REST_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'list_courses' ),
 					'permission_callback' => '__return_true',
-					'args'                => [],
+					'args'                => array(),
 				),
 			),
 			'(?P<key>[\w]+)'  => array(
@@ -116,9 +116,14 @@ class LP_REST_Courses_Controller extends LP_Abstract_REST_Controller {
 			$filter->page       = absint( $request['paged'] ?? 1 );
 			$filter->post_title = LP_Helper::sanitize_params_submitted( $request['s'] ?? '' );
 			$fields_str         = LP_Helper::sanitize_params_submitted( $request['c_fields'] ?? '' );
+			$fields_exclude_str = LP_Helper::sanitize_params_submitted( $request['c_exclude_fields'] ?? '' );
 			if ( ! empty( $fields_str ) ) {
 				$fields         = explode( ',', $fields_str );
 				$filter->fields = $fields;
+			}
+			if ( ! empty( $fields_exclude_str ) ) {
+				$fields_exclude         = explode( ',', $fields_exclude_str );
+				$filter->exclude_fields = $fields_exclude;
 			}
 
 			$author_ids_str = LP_Helper::sanitize_params_submitted( $request['c_author'] ?? '' );
@@ -155,6 +160,8 @@ class LP_REST_Courses_Controller extends LP_Abstract_REST_Controller {
 			} else {
 				// For return data has html
 				if ( $courses ) {
+					// Get only course ids
+					$courses = LP_Course::get_course_ids( $courses );
 					ob_start();
 
 					global $post, $wp;
@@ -197,6 +204,7 @@ class LP_REST_Courses_Controller extends LP_Abstract_REST_Controller {
 		return apply_filters( 'lp/rest-api/frontend/course/archive_course/response', $response );
 	}
 
+	/*
 	public function archive_course( WP_REST_Request $request ) {
 		$response       = new LP_REST_Response();
 		$response->data = new stdClass();
@@ -289,7 +297,7 @@ class LP_REST_Courses_Controller extends LP_Abstract_REST_Controller {
 		$response->data->content = ob_get_clean();
 
 		return rest_ensure_response( apply_filters( 'lp/rest-api/frontend/course/archive_course/response', $response ) );
-	}
+	}*/
 
 	/**
 	 * Rest API for Enroll in single course.
@@ -334,12 +342,12 @@ class LP_REST_Courses_Controller extends LP_Abstract_REST_Controller {
 
 			// Case: if user bought course - or create order manual with order "completed".
 			if ( $course_item && 'purchased' == $course_item->status ) {
-				$user_item_data = [
+				$user_item_data = array(
 					'user_item_id' => $course_item->user_item_id,
 					'graduation'   => LP_COURSE_GRADUATION_IN_PROGRESS,
 					'status'       => LP_COURSE_ENROLLED,
 					'start_time'   => current_time( 'mysql', true ),
-				];
+				);
 
 				$user_item_new_or_update = new LP_User_Item_Course( $user_item_data );
 				$result                  = $user_item_new_or_update->update();
