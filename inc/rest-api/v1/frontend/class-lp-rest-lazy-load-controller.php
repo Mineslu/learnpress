@@ -265,7 +265,11 @@ class LP_REST_Lazy_Load_Controller extends LP_Abstract_REST_Controller {
 			$filters->item_ids     = $include;
 			$filters->item_not_ids = $exclude;
 
-			$section_items = LP_Section_DB::getInstance()->get_section_items_by_section_id( $filters );
+			// $section_items = LP_Section_DB::getInstance()->get_section_items_by_section_id( $filters );
+			$total_rows = 0;
+			$section_items = LP_Section_Items_DB::getInstance()->get_section_items( $filters, $total_rows );
+
+			LP_Debug::var_dump($section_items, __FILE__, __LINE__);
 
 			if ( is_wp_error( $section_items ) ) {
 				throw new Exception( $section_items->get_error_message() );
@@ -273,7 +277,7 @@ class LP_REST_Lazy_Load_Controller extends LP_Abstract_REST_Controller {
 
 			$content = '';
 
-			foreach ( $section_items['results'] as $key => $section_item ) {
+			foreach ( $section_items as $key => $section_item ) {
 				$course_id = LP_Section_DB::getInstance()->get_course_id_by_section( $section_id );
 
 				if ( $course_id ) {
@@ -305,7 +309,7 @@ class LP_REST_Lazy_Load_Controller extends LP_Abstract_REST_Controller {
 			$response->data->pages    = $section_items['pages'];
 			$response->data->page     = $filters->page;
 			$response->data->content  = $content;
-			$response->data->item_ids = wp_list_pluck( $section_items['results'], 'ID' );
+			$response->data->item_ids = wp_list_pluck( $section_items, 'ID' );
 
 			$response->status = 'success';
 			// For old value use on theme Eduma <= v4.6.0 - deprecated 4.1.6.1

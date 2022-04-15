@@ -31,19 +31,32 @@ class LP_Section_Items_DB extends LP_Database {
 	 * @version 1.0.0
 	 * @return array|null|int|string
 	 */
-	public function get_section_items( LP_Section_Items_Filter $filter ) {
-		$default_fields = $this->get_cols_of_table( $this->tb_lp_section_items );
+	public function get_section_items( LP_Section_Items_Filter $filter, int &$total_rows = 0 ) {
+		$default_fields = $this->get_cols_of_table( $this->tb_posts );
 		$filter->fields = array_merge( $default_fields, $filter->fields );
 
 		if ( empty( $filter->collection ) ) {
-			$filter->collection = $this->tb_lp_section_items;
+			$filter->collection = $this->tb_posts;
 		}
 
 		if ( empty( $filter->collection_alias ) ) {
-			$filter->collection_alias = 'si';
+			$filter->collection_alias = 'p';
 		}
 
-		return $this->execute( $filter );
+		$filter->join[] = "INNER JOIN {$this->tb_lp_section_items} AS si ON si.item_id = p.ID";
+
+		// Section id
+		if ( $filter->section_id ) {
+			$filter->where[] = $this->wpdb->prepare( 'AND si.section_id = %d', $filter->section_id );
+		}
+
+		// Item ids
+		if ( ! empty( $filter->term_ids ) ) {
+			$item_ids_format = LP_Helper::db_format_array( $filter->term_ids, '%d' );
+			$filter->where[] = $this->wpdb->prepare( 'AND si.item_id IN (' . $item_ids_format . ')', $filter->item_ids );
+		}
+
+		return $this->execute( $filter, $total_rows );
 	}
 }
 
