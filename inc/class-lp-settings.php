@@ -379,7 +379,8 @@ class LP_Settings {
 			$defaults  = array();
 			$endpoints = array();
 
-			$settings = LP()->settings->get( 'profile_endpoints' );
+			$settings = LP()->settings()->get( 'profile_endpoints' );
+
 			if ( $settings ) {
 				foreach ( $settings as $k => $v ) {
 					$k               = preg_replace( '!_!', '-', $k );
