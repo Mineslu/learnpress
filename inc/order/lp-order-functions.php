@@ -776,6 +776,7 @@ if ( ! function_exists( 'learn_press_cancel_order_process' ) ) {
 			return;
 		}
 
+		$url      = '';
 		$order_id = absint( $_REQUEST['cancel-order'] );
 		$order    = learn_press_get_order( $order_id );
 		$user     = learn_press_get_current_user();
@@ -792,9 +793,11 @@ if ( ! function_exists( 'learn_press_cancel_order_process' ) ) {
 		} else {
 			learn_press_add_message( sprintf( __( 'Order number <strong>%s</strong> can not be cancelled', 'learnpress' ), $order->get_order_number() ), 'error' );
 		}
-		if ( ! $url ) {
-			$url = learn_press_user_profile_link( $user->get_id(), LP()->settings->get( 'profile_endpoints.profile-orders', 'orders' ) );
+
+		if ( empty( $url ) ) {
+			$url = learn_press_user_profile_link( $user->get_id(), LP()->settings()->get( 'profile_endpoints.profile-orders', 'orders' ) );
 		}
+
 		wp_safe_redirect( $url );
 		exit();
 	}
