@@ -279,7 +279,7 @@ if ( ! class_exists( 'LearnPress' ) ) {
 			require_once 'inc/curds/class-lp-user-curd.php';
 			require_once 'inc/curds/class-lp-user-item-curd.php';
 
-			require_once 'inc/class-lp-backward-plugins.php';
+			// require_once 'inc/class-lp-backward-plugins.php';
 			require_once 'inc/class-lp-debug.php';
 			require_once 'inc/class-lp-global.php';
 			require_once 'inc/admin/meta-box/class-lp-meta-box-helper.php';

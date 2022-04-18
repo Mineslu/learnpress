@@ -249,8 +249,9 @@ function learn_press_get_quizzes( $user_id = 0, &$args = array() ) {
  *
  * @param string|array $types
  * @param string|array $supports
+ * @deprecated 4.1.6.4
  */
-function learn_press_add_question_type_support( $types, $supports ) {
+/*function learn_press_add_question_type_support( $types, $supports ) {
 	if ( empty( $GLOBALS['learn_press_question_type_support'] ) ) {
 		$GLOBALS['learn_press_question_type_support'] = array();
 	}
@@ -278,7 +279,7 @@ function learn_press_add_question_type_support( $types, $supports ) {
 		}
 	}
 	$GLOBALS['learn_press_question_type_support'] = $_supports;
-}
+}*/
 
 /**
  * @param string $type
@@ -329,7 +330,10 @@ function learn_press_question_type_support( $type, $features ) {
 	return $has_support;
 }
 
-function learn_press_default_question_type_support() {
+/**
+ * @deprecated 4.1.6.4
+ */
+/*function learn_press_default_question_type_support() {
 	learn_press_add_question_type_support(
 		array(
 			'multi_choice',
@@ -341,7 +345,7 @@ function learn_press_default_question_type_support() {
 	);
 }
 
-add_action( 'plugins_loaded', 'learn_press_default_question_type_support' );
+add_action( 'plugins_loaded', 'learn_press_default_question_type_support' );*/
 
 
 if ( ! function_exists( 'learn_press_quiz_get_questions_order' ) ) {

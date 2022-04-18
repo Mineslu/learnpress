@@ -1,0 +1,18 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+#: ../../assets/src/apps/js/frontend/question-types/components/questions/fill-in-blanks/index.js:72
+msgid "Points"
+msgstr ""
+
+#: ../../assets/src/apps/js/frontend/question-types/components/questions/fill-in-blanks/index.js:73
+msgid "point"
+msgstr ""
+
+#: ../../assets/src/apps/js/frontend/question-types/components/questions/fill-in-blanks/index.js:74
+msgid "Correct"
+msgstr ""
+
+#: ../../assets/src/apps/js/frontend/question-types/components/questions/fill-in-blanks/index.js:75
+msgid "Incorrect"
+msgstr ""

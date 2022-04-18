@@ -4,6 +4,7 @@
  * Class LP_Backward_Addons
  *
  * @since 3.0.0
+ * @deprecated 4.1.6.4
  */
 class LP_Backward_Addons {
 
