@@ -154,16 +154,20 @@ if ( ! class_exists( 'LP_Question_CURD' ) ) {
 				return new WP_Error( __( '<p>Op! The question does not exist</p>', 'learnpress' ) );
 			}
 
+			$user_id = $args['meta_input']['_lp_user'] ?? get_current_user_id();
 			// ensure that user can create question
-			if ( ! current_user_can( 'edit_posts' ) ) {
+			if ( ! user_can( $user_id, 'edit_posts' ) ) {
 				return new WP_Error( __( '<p>Sorry! You don\'t have permission to duplicate this question</p>', 'learnpress' ) );
 			}
 
 			// origin question
 			$question = LP_Question::get_question( $question_id );
 
+			$default = array(
+				'post_status' => 'publish',
+			);
 			// duplicate question
-			$new_question_id = learn_press_duplicate_post( $question_id, array( 'post_status' => 'publish' ) );
+			$new_question_id = learn_press_duplicate_post( $question_id, wp_parse_args( $args, $default ) );
 
 			if ( ! $new_question_id || is_wp_error( $new_question_id ) ) {
 				return new WP_Error( __( '<p>Sorry! Failed to duplicate question!</p>', 'learnpress' ) );
@@ -182,6 +186,8 @@ if ( ! class_exists( 'LP_Question_CURD' ) ) {
 
 				// duplicate answer
 				$this->duplicate_answer( $question_id, $new_question_id );
+
+				do_action( 'learn-press/after-duplicate', $question_id, $new_question_id, $args );
 
 				return $new_question_id;
 			}
@@ -212,6 +218,36 @@ if ( ! class_exists( 'LP_Question_CURD' ) ) {
 							'order'       => $option->order,
 						),
 						array( '%d', '%s', '%s', '%s', '%s' )
+					);
+				}
+			}
+
+			// add metadata with type fill_in_blank
+			$question = learn_press_get_question( $question_id );
+			if ( $question->get_type() == 'fill_in_blanks' ) {
+				// get question_answer_id of question translated
+				$new_answer = $wpdb->get_row(
+					$wpdb->prepare( "SELECT question_answer_id FROM $wpdb->learnpress_question_answers WHERE question_id = %d", $new_question_id )
+				);
+				// get metadata question orgin
+				$meta_data_origin = $wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT * FROM $wpdb->learnpress_question_answermeta as asm
+						INNER JOIN $wpdb->learnpress_question_answers as an ON an.question_answer_id = asm.learnpress_question_answer_id
+						WHERE an.question_id = %d",
+						$question_id
+					)
+				);
+
+				if ( ! empty( $meta_data_origin ) && ! empty( $new_answer ) ) {
+					$wpdb->insert(
+						$wpdb->learnpress_question_answermeta,
+						array(
+							'learnpress_question_answer_id' => $new_answer->question_answer_id,
+							'meta_key'   => '_blanks',
+							'meta_value' => $meta_data_origin->meta_value,
+						),
+						array( '%d', '%s', '%s' )
 					);
 				}
 			}

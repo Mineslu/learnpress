@@ -160,13 +160,18 @@ if ( ! function_exists( 'LP_Quiz_CURD' ) ) {
 				return new WP_Error( __( '<p>Op! The quiz does not exist</p>', 'learnpress' ) );
 			}
 
+			$user_id = $args['meta_input']['_lp_user'] ?? get_current_user_id();
 			// ensure that user can create quiz
-			if ( ! current_user_can( 'edit_posts' ) ) {
+			if ( ! user_can( $user_id, 'edit_posts' ) ) {
 				return new WP_Error( __( '<p>Sorry! You have not permission to duplicate this quiz</p>', 'learnpress' ) );
 			}
 
+			$default = array(
+				'post_status' => 'publish',
+			);
+
 			// duplicate quiz
-			$new_quiz_id = learn_press_duplicate_post( $quiz_id, $args, true );
+			$new_quiz_id = learn_press_duplicate_post( $quiz_id, wp_parse_args( $args, $default ), true );
 
 			if ( ! $new_quiz_id || is_wp_error( $new_quiz_id ) ) {
 				return new WP_Error( __( '<p>Sorry! Failed to duplicate quiz!</p>', 'learnpress' ) );
@@ -192,6 +197,8 @@ if ( ! function_exists( 'LP_Quiz_CURD' ) ) {
 						$this->add_question( $new_quiz_id, $new_question_id );
 					}
 				}
+
+				do_action( 'learn-press/after-duplicate', $quiz_id, $new_quiz_id, $args );
 
 				return $new_quiz_id;
 			}
