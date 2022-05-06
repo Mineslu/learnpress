@@ -782,7 +782,11 @@ if ( ! function_exists( 'learn_press_page_title' ) ) {
 	}
 }
 
+/**
+ * @depecated 4.1.6.4
+ */
 function learn_press_template_redirect() {
+	_deprecated_function( __FUNCTION__, '4.1.6.4' );
 	global $wp_query, $wp;
 
 	// When default permalinks are enabled, redirect shop page to post type archive url
@@ -792,7 +796,7 @@ function learn_press_template_redirect() {
 	}
 }
 
-add_action( 'template_redirect', 'learn_press_template_redirect' );
+// add_action( 'template_redirect', 'learn_press_template_redirect' );
 
 
 /**
@@ -882,7 +886,7 @@ function learn_press_get_template( $template_name = '', $args = array(), $templa
 		$log = sprintf( 'TEMPLATE MISSING: Template %s doesn\'t exists.', $template_name );
 		error_log( $log );
 
-		if ( learn_press_is_debug() ) {
+		if ( LP_Debug::is_debug() ) {
 			echo sprintf( '<span title="%s" class="learn-press-template-warning"></span>', $log );
 		}
 
@@ -1165,7 +1169,11 @@ function learn_press_label_html( $label, $type = '' ) {
 	<?php
 }
 
+/**
+ * @depecated 4.1.6.4
+ */
 function learn_press_get_course_redirect( $link ) {
+	_deprecated_function( __FUNCTION__, '4.1.6.4' );
 	if ( empty( $_SERVER['HTTP_REFERER'] ) ) {
 		return $link;
 	}

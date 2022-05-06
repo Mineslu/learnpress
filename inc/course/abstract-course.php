@@ -244,7 +244,7 @@ if ( ! function_exists( 'LP_Abstract_Course' ) ) {
 				LP_Course_Utils::set_section_items( $section_id, $its );
 			}
 
-			learn_press_cache_add_post_type( $item_by_types );
+			// learn_press_cache_add_post_type( $item_by_types );
 
 			/*
 			return ;
@@ -838,7 +838,8 @@ if ( ! function_exists( 'LP_Abstract_Course' ) ) {
 		 * @return mixed
 		 */
 		public function get_price() {
-			$price = LP_Cache::cache_load_first( 'get', 'course-price-' . $this->get_id() );
+			$key_cache = "{$this->get_id()}/price";
+			$price     = LP_Course_Cache::cache_load_first( 'get', $key_cache );
 
 			if ( false === $price ) {
 				if ( $this->has_sale_price() ) {
@@ -854,7 +855,7 @@ if ( ! function_exists( 'LP_Abstract_Course' ) ) {
 				// For case set sale by days range
 				update_post_meta( $this->get_id(), '_lp_price', $price );
 
-				LP_Cache::cache_load_first( 'set', 'course-price-' . $this->get_id(), $price );
+				LP_Course_Cache::cache_load_first( 'set', $key_cache, $price );
 			}
 
 			return apply_filters( 'learn-press/course/price', $price, $this->get_id() );
@@ -1110,8 +1111,17 @@ if ( ! function_exists( 'LP_Abstract_Course' ) ) {
 		 * @return int
 		 */
 		public function get_total_user_enrolled_or_purchased(): int {
-			$lp_course_db = LP_Course_DB::getInstance();
-			return $lp_course_db->get_total_user_enrolled_or_purchased( $this->get_id() );
+			$key_cache           = "{$this->get_id()}/total-students-attended";
+			$total_user_enrolled = LP_Course_Cache::cache_load_first( 'get', $key_cache );
+
+			if ( false === $total_user_enrolled ) {
+				$lp_course_db        = LP_Course_DB::getInstance();
+				$total_user_enrolled = $lp_course_db->get_total_user_enrolled_or_purchased( $this->get_id() );
+
+				LP_Course_Cache::cache_load_first( 'set', $key_cache, $total_user_enrolled );
+			}
+
+			return $total_user_enrolled;
 		}
 
 		/**
@@ -1180,9 +1190,9 @@ if ( ! function_exists( 'LP_Abstract_Course' ) ) {
 			$item = false;
 
 			if ( $this->has_item( $item_id ) ) {
-				if ( false === wp_cache_get( $item_id, 'posts' ) ) {
+				/*if ( false === wp_cache_get( $item_id, 'posts' ) ) {
 					LP_Helper_CURD::cache_posts( $this->get_item_ids() );
-				}
+				}*/
 
 				$item = LP_Course_Item::get_item( $item_id, $this->get_id() );
 			}
@@ -1323,8 +1333,8 @@ if ( ! function_exists( 'LP_Abstract_Course' ) ) {
 			$slug_prefixes = apply_filters(
 				'learn-press/course/custom-item-prefixes',
 				array(
-					LP_QUIZ_CPT   => sanitize_title_with_dashes( LP()->settings->get( 'quiz_slug', 'quiz' ) ),
-					LP_LESSON_CPT => sanitize_title_with_dashes( LP()->settings->get( 'lesson_slug', 'lesson' ) ),
+					LP_QUIZ_CPT   => sanitize_title_with_dashes( LP()->settings->get( 'quiz_slug', 'quizzes' ) ),
+					LP_LESSON_CPT => sanitize_title_with_dashes( LP()->settings->get( 'lesson_slug', 'lessons' ) ),
 				),
 				$this->get_id()
 			);

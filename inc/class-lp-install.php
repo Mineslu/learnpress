@@ -56,23 +56,35 @@ if ( ! function_exists( 'LP_Install' ) ) {
 		 * @since 4.0.0
 		 */
 		public function on_activate() {
-			update_option( 'learn_press_status', 'activated' );
+			// update_option( 'learn_press_status', 'activated' );
 
 			$this->create_tables();
 
-			/*// Force option permalink to 'postname'.
+			if ( ! self::tables_install_done() ) {
+				return;
+			}
+
+			// Check if LP install before has db version
+			if ( ! get_option( LP_KEY_DB_VERSION, false ) ) {
+				// Save database version of LP
+				update_option( LP_KEY_DB_VERSION, LearnPress::instance()->db_version );
+			}
+
+			update_option( 'learnpress_version', LearnPress::instance()->version );
+
+			// Create pages default.
+			self::create_pages();
+
+			// Set permalink is "Post name".
 			if ( ! get_option( 'permalink_structure' ) ) {
 				update_option( 'permalink_structure', '/%postname%/' );
+				// flush_rewrite_rules();
 			}
 
 			// Force option users_can_register to ON.
 			if ( ! get_option( 'users_can_register' ) ) {
 				update_option( 'users_can_register', 1 );
 			}
-
-			if ( ! get_option( 'learn_press_currency' ) ) {
-				update_option( 'learn_press_currency', 'USD' );
-			}*/
 		}
 
 		/**
@@ -105,9 +117,12 @@ if ( ! function_exists( 'LP_Install' ) ) {
 
 		/**
 		 * Run installation after LearnPress is activated.
+		 *
+		 * @depecated 4.1.6.4
 		 */
 		public static function install() {
-			self::create_options();
+			_deprecated_function( __FUNCTION__, '4.1.6.4' );
+			/*self::create_options();
 			self::_create_pages();
 			self::_create_cron_jobs();
 			self::_delete_transients();
@@ -130,7 +145,7 @@ if ( ! function_exists( 'LP_Install' ) ) {
 
 			//if ( ! get_option( 'learnpress_db_version' ) ) {
 			update_option( 'learnpress_db_version', (int) LEARNPRESS_VERSION );
-			//}
+			//}*/
 		}
 
 		protected static function _clear_backgrounds() {
@@ -267,25 +282,32 @@ if ( ! function_exists( 'LP_Install' ) ) {
 				AND b.option_name = CONCAT( '_transient_timeout_', SUBSTRING( a.option_name, 12 ) )
 				AND b.option_value < %d
 			";
-			$wpdb->query( $wpdb->prepare( $sql, $wpdb->esc_like( '_transient_' ) . '%',
-				$wpdb->esc_like( '_transient_timeout_' ) . '%', time() ) );
+			$wpdb->query(
+				$wpdb->prepare(
+					$sql,
+					$wpdb->esc_like( '_transient_' ) . '%',
+					$wpdb->esc_like( '_transient_timeout_' ) . '%',
+					time()
+				)
+			);
 		}
 
 		/**
 		 * Remove learnpress page if total of learn page > 10
 		 *
 		 * @return mixed
+		 * @depecated 4.1.6.4
 		 */
-		public static function _remove_pages() {
+		/*public static function _remove_pages() {
 			global $wpdb;
 
 			// Get all pages
 			$sql = $wpdb->prepare(
 				"
 				SELECT *
-	            FROM {$wpdb->posts} p
-	            INNER JOIN  {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key= %s AND p.post_type = %s
-	        ",
+				FROM {$wpdb->posts} p
+				INNER JOIN  {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key= %s AND p.post_type = %s
+				",
 				'_learn_press_page',
 				'page'
 			);
@@ -316,12 +338,12 @@ if ( ! function_exists( 'LP_Install' ) ) {
 			}
 
 			return array();
-		}
+		}*/
 
 		/**
 		 * Create default pages for LP
 		 */
-		public static function _create_pages() {
+		/*public static function _create_pages() {
 			global $wpdb;
 
 			// Just delete duplicated pages
@@ -406,6 +428,60 @@ if ( ! function_exists( 'LP_Install' ) ) {
 			}
 
 			flush_rewrite_rules();
+		}*/
+
+		/**
+		 * Create default pages for LP
+		 */
+		public static function create_pages() {
+			$pages = self::$_pages;
+
+			try {
+				foreach ( $pages as $page ) {
+					// Check if page has already existed
+					$page_id = get_option( "learn_press_{$page}_page_id", false );
+
+					if ( $page_id && get_post_type( $page_id ) == 'page' && get_post_status( $page_id ) == 'publish' ) {
+						continue;
+					}
+
+					//$page_id = self::_search_page( $page, $pages );
+
+					if ( $page === 'courses' ) {
+						$page_title = 'All Courses';
+						$page_slug  = $page;
+					} else {
+						$page_title = ucwords( str_replace( '_', ' ', $page ) );
+						$page_slug  = 'lp-' . str_replace( '_', '-', $page );
+					}
+
+					if ( $page === 'profile' ) {
+						$page_content = '<!-- wp:shortcode -->[' . apply_filters( 'learn-press/shortcode/profile/tag', 'learn_press_profile' ) . ']<!-- /wp:shortcode -->';
+					} else {
+						$page_content = '';
+					}
+
+					$page_id = wp_insert_post(
+						array(
+							'post_title'     => $page_title,
+							'post_name'      => $page_slug,
+							'post_status'    => 'publish',
+							'post_type'      => 'page',
+							'comment_status' => 'closed',
+							'post_content'   => $page_content ?? '',
+							'post_author'    => get_current_user_id(),
+						)
+					);
+
+					if ( ! $page_id instanceof WP_Error ) {
+						update_option( "learn_press_{$page}_page_id", $page_id );
+					}
+				}
+
+				flush_rewrite_rules();
+			} catch ( Exception $ex ) {
+				error_log( $ex->getMessage() );
+			}
 		}
 
 		/**
@@ -415,8 +491,9 @@ if ( ! function_exists( 'LP_Install' ) ) {
 		 * @param $types
 		 *
 		 * @return int|mixed
+		 * @depecated 4.1.6.4
 		 */
-		protected static function _search_page( $type, $types ) {
+		/*protected static function _search_page( $type, $types ) {
 			static $pages = array();
 
 			if ( empty( $pages[ $type ] ) ) {
@@ -446,12 +523,19 @@ if ( ! function_exists( 'LP_Install' ) ) {
 			$page_id = ! empty( $pages[ $type ] ) ? $pages[ $type ] : 0;
 
 			return $page_id;
-		}
+		}*/
 
+		/**
+		 * @depecated 4.1.6.4
+		 */
 		private static function _create_cron_jobs() {
+			_deprecated_function( __FUNCTION__, '4.1.6.4' );
 			wp_clear_scheduled_hook( 'learn_press_cleanup_sessions' );
-			wp_schedule_event( time(), apply_filters( 'learn_press_cleanup_session_recurrence', 'twicedaily' ),
-				'learn_press_cleanup_sessions' );
+			wp_schedule_event(
+				time(),
+				apply_filters( 'learn_press_cleanup_session_recurrence', 'twicedaily' ),
+				'learn_press_cleanup_sessions'
+			);
 		}
 
 		/**

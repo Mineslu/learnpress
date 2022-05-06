@@ -32,7 +32,7 @@ if ( ! class_exists( 'LP_Admin' ) ) {
 			add_action( 'admin_notices', array( $this, 'notice_required_permalink' ) );
 			add_action( 'admin_notices', array( $this, 'admin_notices' ), 1 );
 			//add_action( 'admin_head', array( $this, 'admin_colors' ) );
-			add_action( 'admin_init', array( $this, 'admin_redirect' ) );
+			// add_action( 'admin_init', array( $this, 'admin_redirect' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'load_modal' ) );
 
 			add_filter( 'admin_body_class', array( $this, 'body_class' ) );
@@ -548,7 +548,7 @@ if ( ! class_exists( 'LP_Admin' ) ) {
 				return;
 			}
 
-			if ( 'yes' === get_option( 'learn_press_install' ) ) {
+			if ( ! get_option( 'learn_press_setup_wizard_completed', false ) ) {
 				learn_press_admin_view( 'setup/notice-setup' );
 			}
 
@@ -584,14 +584,15 @@ if ( ! class_exists( 'LP_Admin' ) ) {
 
 		/**
 		 * Redirect to setup page if we have just activated LP
+		 * @depecated 4.1.6.4
 		 */
-		public function admin_redirect() {
+		/*public function admin_redirect() {
 			if ( 'yes' === get_transient( 'lp_activation_redirect' ) && current_user_can( 'install_plugins' ) ) {
 				delete_transient( 'lp_activation_redirect' );
 
-				wp_safe_redirect( admin_url( 'index.php?page=lp-setup' ) );
+				exit( wp_safe_redirect( admin_url( 'index.php?page=lp-setup' ) ) );
 			}
-		}
+		}*/
 
 		/**
 		 * Custom admin body classes.
@@ -622,16 +623,18 @@ if ( ! class_exists( 'LP_Admin' ) ) {
 		public function notice_required_permalink() {
 			if ( current_user_can( 'manage_options' ) ) {
 				if ( ! get_option( 'permalink_structure' ) ) {
-					learn_press_add_notice(
-						sprintf(
-							__(
-								'LearnPress requires permalink option <strong>Post name</strong> is enabled. Please enable it <a href="%s">here</a> to ensure that all functions work properly.',
-								'learnpress'
-							),
+					?>
+					<div class="notice notice-error">
+						<p>
+						<?php
+						echo sprintf(
+							'LearnPress requires permalink option <strong>Post name</strong> is enabled. Please enable it <a href="%s">here</a> to ensure that all functions work properly.',
 							admin_url( 'options-permalink.php' )
-						),
-						'error'
-					);
+						)
+						?>
+						</p>
+					</div>
+					<?php
 				}
 			}
 		}
@@ -807,7 +810,7 @@ if ( ! class_exists( 'LP_Admin' ) ) {
 			require_once LP_PLUGIN_PATH . 'inc/background-process/class-lp-background-query-items.php';
 			include_once 'class-lp-admin-assets.php';
 			include_once 'class-lp-admin-dashboard.php';
-			include_once 'class-lp-admin-tools.php';
+			// include_once 'class-lp-admin-tools.php';
 			include_once 'class-lp-admin-ajax.php';
 			include_once 'editor/class-lp-admin-editor.php';
 			include_once 'class-lp-admin-menu.php';
@@ -816,7 +819,7 @@ if ( ! class_exists( 'LP_Admin' ) ) {
 			include_once 'class-lp-modal-search-items.php';
 			include_once 'class-lp-modal-search-users.php';
 			include_once 'class-lp-setup-wizard.php';
-			//          include_once 'class-lp-updater.php';
+			// include_once 'class-lp-updater.php';
 			include_once 'class-lp-install-sample-data.php';
 			include_once 'class-lp-reset-data.php';
 			include_once LP_PLUGIN_PATH . 'inc/admin/views/meta-boxes/course/settings.php';

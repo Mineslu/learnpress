@@ -111,9 +111,10 @@ if ( ! function_exists( 'learn_press_settings_tabs_array' ) ) {
 	 * Default admin settings pages
 	 *
 	 * @return mixed
+	 * @depecated 4.1.6.4
 	 */
-	function learn_press_settings_tabs_array() {
-		$default_tabs = array(
+	/*function learn_press_settings_tabs_array() {
+		$tabs = array(
 			'general'  => include_once LP_PLUGIN_PATH . 'inc/admin/settings/class-lp-settings-general.php',
 			'courses'  => include_once LP_PLUGIN_PATH . 'inc/admin/settings/class-lp-settings-courses.php',
 			'profile'  => include_once LP_PLUGIN_PATH . 'inc/admin/settings/class-lp-settings-profile.php',
@@ -122,10 +123,8 @@ if ( ! function_exists( 'learn_press_settings_tabs_array' ) ) {
 			'advanced' => include_once LP_PLUGIN_PATH . 'inc/admin/settings/class-lp-settings-advanced.php',
 		);
 
-		$tabs = apply_filters( 'learn_press_settings_tabs_array', $default_tabs );
-
 		return apply_filters( 'learn-press/admin/settings-tabs-array', $tabs );
-	}
+	}*/
 }
 
 function learn_press_is_hidden_post_box( $id, $user_id = 0 ) {
@@ -236,7 +235,7 @@ function learn_press_pages_dropdown( $name, $selected = false, $args = array() )
 		$id = $name;
 	}
 
-	$class .= 'list-pages lp-list-pages';
+	$class .= 'list-pages lp-list-pages learn-press-select2';
 
 	$args    = array(
 		'name'             => $name,
@@ -1599,62 +1598,6 @@ function learn_press_copy_post_meta( $from_id, $to_id ) {
 		$wpdb->query( $sql_query );
 	}
 }
-
-/**
- * Install a plugin
- *
- * @param string $plugin_name
- *
- * @return array
- * @editor tungnx
- * @reason not use
- */
-/*
-function learn_press_install_add_on( $plugin_name ) {
-	require_once LP_PLUGIN_PATH . '/inc/admin/class-lp-upgrader.php';
-	$upgrader = new LP_Upgrader();
-
-	global $wp_filesystem;
-
-	$response = array();
-
-	$package = 'http://thimpress.com/lprepo/' . $plugin_name . '.zip';
-
-	$package = $upgrader->download_package( $package );
-
-	if ( is_wp_error( $package ) ) {
-		$response['error'] = $package;
-	} else {
-		$working_dir = $upgrader->unpack_package( $package, true, $plugin_name );
-
-		if ( is_wp_error( $working_dir ) ) {
-			$response['error'] = $working_dir;
-		} else {
-			$wp_upgrader = new WP_Upgrader();
-			$options     = array(
-				'source'            => $working_dir,
-				'destination'       => WP_PLUGIN_DIR,
-				'clear_destination' => false,
-				'clear_working'     => true,
-				'hook_extra'        => array(
-					'type'   => 'plugin',
-					'action' => 'install',
-				),
-			);
-
-			$result = $wp_upgrader->install_package( $options );
-
-			if ( is_wp_error( $result ) ) {
-				$response['error'] = $result;
-			} else {
-				$response         = $result;
-				$response['text'] = __( 'Installed', 'learnpress' );
-			}
-		}
-	}
-
-	return $response;
-}*/
 
 /**
  * Check to see if a plugin is already installed or not

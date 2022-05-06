@@ -199,7 +199,7 @@ class LP_Settings {
 
 	public function refresh() {
 		if ( $this->_load_data ) {
-			$this->_load_options( true );
+			// $this->_load_options( true );
 		}
 
 		return $this;
@@ -409,15 +409,4 @@ class LP_Settings {
 	}
 }
 
-if ( ! function_exists( 'lp_settings' ) ) {
-	/**
-	 * Instance lp setting
-	 *
-	 * @return LP_Settings|null
-	 */
-	function lp_settings() {
-		return LP_Settings::instance();
-	}
-
-	lp_settings();
-}
+LP_Settings::instance();
