@@ -338,7 +338,7 @@ if ( ! class_exists( 'LP_Email' ) ) {
 				$this->email_format = ( $this->settings->get( 'email_content.format' ) == 'plain_text' ) ? 'plain' : 'html';
 			} else {
 				if ( LP()->settings()->get( 'emails_general.default_email_content' ) ) {
-					$this->email_format = LP()->settings->get( 'emails_general.default_email_content' );
+					$this->email_format = LP()->settings()->get( 'emails_general.default_email_content' );
 				}
 			}
 
@@ -407,7 +407,7 @@ if ( ! class_exists( 'LP_Email' ) ) {
 		 * @return mixed
 		 */
 		public function is_configured() {
-			return LP()->settings->get( $this->_option_id );
+			return LP()->settings()->get( $this->_option_id );
 		}
 
 		/**
@@ -593,7 +593,7 @@ if ( ! class_exists( 'LP_Email' ) ) {
 		 * @return string
 		 */
 		public function get_footer_text(): string {
-			$text = LP()->settings->get( 'emails_general.footer_text', 'LearnPress' );
+			$text = LP()->settings()->get( 'emails_general.footer_text', 'LearnPress' );
 
 			return LP_Helper::sanitize_params_submitted( $text, 'html' );
 		}
@@ -675,7 +675,7 @@ if ( ! class_exists( 'LP_Email' ) ) {
 		 * @version 1.0.1
 		 */
 		public function get_from_name(): string {
-			$name = LP()->settings->get( 'emails_general.from_name', get_option( 'blogname' ) );
+			$name = LP()->settings()->get( 'emails_general.from_name', get_option( 'blogname' ) );
 
 			return LP_Helper::sanitize_params_submitted( $name );
 		}

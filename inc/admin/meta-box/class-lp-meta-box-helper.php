@@ -316,7 +316,7 @@ if ( ! class_exists( 'LP_Meta_Box_Helper' ) ) {
 				}
 			} else {
 				// Single value
-				$option_value = LP()->settings->get( preg_replace( '!^learn_press_!', '', $option_name ), null );
+				$option_value = LP()->settings()->get( preg_replace( '!^learn_press_!', '', $option_name ), null );
 			}
 
 			if ( ! is_array( $option_value ) && ! is_null( $option_value ) ) {

@@ -30,7 +30,7 @@ if ( ! function_exists( 'learn_press_remove_course_buttons' ) ) {
 	function learn_press_remove_course_buttons() {
 		remove_action( 'learn-press/course-buttons', LP()->template( 'course' )->func( 'course_enroll_button' ), 5 );
 		remove_action( 'learn-press/course-buttons', LP()->template( 'course' )->func( 'course_purchase_button' ), 10 );
-		//remove_action( 'learn-press/course-buttons', LP()->template( 'course' )->func( 'course_external_button' ), 15 );
+		// remove_action( 'learn-press/course-buttons', LP()->template( 'course' )->func( 'course_external_button' ), 15 );
 		remove_action( 'learn-press/course-buttons', LP()->template( 'course' )->func( 'button_retry' ), 20 );
 		remove_action( 'learn-press/course-buttons', LP()->template( 'course' )->func( 'course_continue_button' ), 25 );
 		remove_action( 'learn-press/course-buttons', LP()->template( 'course' )->func( 'course_finish_button' ), 30 );
@@ -246,13 +246,14 @@ add_filter( 'admin_bar_menu', 'learn_press_content_item_edit_links', 90 );
  * @editor tungnx
  * @modify 4.1.5 - comment - not use
  */
-//if ( ! function_exists( 'learn_press_control_displaying_course_item' ) ) {
+// if ( ! function_exists( 'learn_press_control_displaying_course_item' ) ) {
 	/**
 	 * If user is viewing content of an item instead of the whole course
 	 * then remove all content of course and replace with content of
 	 * that item.
 	 */
-	/*function learn_press_control_displaying_course_item() {
+	/*
+	function learn_press_control_displaying_course_item() {
 		global $wp_filter;
 
 		// Remove all hooks added to content of whole course.
@@ -272,15 +273,16 @@ add_filter( 'admin_bar_menu', 'learn_press_content_item_edit_links', 90 );
 			}
 		}
 	}*/
-//}
+// }
 
 /**
  * @editor tungnx
  * @modify 4.1.5 - comment - not use from 4.1.4
  */
-//if ( ! function_exists( 'learn_press_single_course_args' ) ) {
+// if ( ! function_exists( 'learn_press_single_course_args' ) ) {
 	// Todo: check why call more time - tungnx
-	/*function learn_press_single_course_args() {
+	/*
+	function learn_press_single_course_args() {
 		static $output = array();
 
 		if ( ! $output ) {
@@ -298,7 +300,7 @@ add_filter( 'admin_bar_menu', 'learn_press_content_item_edit_links', 90 );
 
 		return $output;
 	}*/
-//}
+// }
 
 if ( ! function_exists( 'learn_press_single_quiz_args' ) ) {
 	function learn_press_single_quiz_args() {
@@ -329,6 +331,7 @@ if ( ! function_exists( 'learn_press_single_quiz_args' ) ) {
 				'status'              => $user->get_item_status( $quiz->get_id(), $course_id ),
 				'checkNorequizenroll' => $course->is_no_required_enroll(),
 				'navigationPosition'  => LP_Settings::get_option( 'navigation_position', 'yes' ),
+				'quiz_preview'        => get_post_meta( $quiz->get_id(), '_quiz_preview', true ),
 			);
 		}
 
@@ -766,7 +769,8 @@ if ( ! function_exists( 'learn_press_page_title' ) ) {
 
 		if ( is_search() ) {
 			// Comment by tungnx
-			/*$page_title = sprintf( __( 'Search Results for: &ldquo;%s&rdquo;', 'learnpress' ), get_search_query() );
+			/*
+			$page_title = sprintf( __( 'Search Results for: &ldquo;%s&rdquo;', 'learnpress' ), get_search_query() );
 
 			if ( get_query_var( 'paged' ) ) {
 				$page_title .= sprintf( __( '&nbsp;&ndash; Page %s', 'learnpress' ), get_query_var( 'paged' ) );
@@ -1533,10 +1537,10 @@ add_filter(
 function learn_press_courses_layouts() {
 	return apply_filters(
 		'learnpress/archive-courses-layouts',
-		[
+		array(
 			'grid' => 'Grid',
 			'list' => 'List',
-		]
+		)
 	);
 }
 

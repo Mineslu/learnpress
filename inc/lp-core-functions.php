@@ -1496,7 +1496,7 @@ function learn_press_get_page_link( string $key ): string {
  * @return string
  */
 function learn_press_get_page_title( $key ) {
-	$page_id = LP()->settings->get( $key . '_page_id' );
+	$page_id = LP()->settings()->get( $key . '_page_id' );
 	$title   = '';
 
 	if ( $page_id && get_post_status( $page_id ) == 'publish' ) {

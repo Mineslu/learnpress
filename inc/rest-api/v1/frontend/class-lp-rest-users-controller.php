@@ -51,7 +51,8 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 	 * @editor tungnx
 	 * @modify 4.1.4.1 - comment - not use - run wrong
 	 */
-	/*public function rest_pre_dispatch( $null, $server, $request ) {
+	/*
+	public function rest_pre_dispatch( $null, $server, $request ) {
 		$user_id   = get_current_user_id();
 		$item_id   = $request['item_id'] ?? 0;
 		$course_id = $request['course_id'] ?? 0;
@@ -280,10 +281,15 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 				throw new Exception( __( 'Quiz is invalid!', 'learnpress' ) );
 			}
 
+			$response = apply_filters( 'lp/start_quiz/before', $response, $quiz, $course, $user );
+
+			if ( $response['status'] == 'success' ) {
+				return rest_ensure_response( $response );
+			}
 			// For no required enroll course
 			if ( $user->is_guest() && $course->is_no_required_enroll() ) {
 				if ( $quiz->get_retake_count() >= 0 ) {
-					//learn_press_remove_cookie( 'quiz_submit_status_' . $course_id . '_' . $item_id . '' );
+					// learn_press_remove_cookie( 'quiz_submit_status_' . $course_id . '_' . $item_id . '' );
 				}
 				$no_required_enroll = new LP_Course_No_Required_Enroll( $course );
 				$response           = $no_required_enroll->guest_start_quiz( $quiz );
@@ -297,7 +303,7 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 				 * @var LP_User_Item_Quiz $user_quiz
 				 */
 				$user_quiz           = $user->retake_quiz( $item_id, $course_id, true );
-				$results['answered'] = []; // Reset answered before on js
+				$results['answered'] = array(); // Reset answered before on js
 			} else {
 				/**
 				 * @var LP_User_Item_Quiz $user_quiz
@@ -334,7 +340,7 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 					'quiz_status'         => $status,
 					'checked_questions'   => $checked_questions,
 					'hinted_questions'    => $hinted_questions,
-					'answered'            => [],
+					'answered'            => array(),
 					'show_correct_review' => $show_correct_review,
 				)
 			);
@@ -362,7 +368,8 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 	 *
 	 * @return mixed|WP_REST_Response
 	 */
-	/*public function submit_quiz_bk( $request ) {
+	/*
+	public function submit_quiz_bk( $request ) {
 		$user_id     = get_current_user_id();
 		$item_id     = $request['item_id'];
 		$course_id   = $request['course_id'];
@@ -478,7 +485,7 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 	 * @version 1.0.1
 	 */
 	public function submit_quiz_new( WP_REST_Request $request ) {
-		//$response = new LP_REST_Response();
+		// $response = new LP_REST_Response();
 		$response = array(
 			'status'  => 'error',
 			'message' => '',
@@ -488,13 +495,20 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 			$user_id    = get_current_user_id();
 			$item_id    = $request['item_id'] ?? 0;
 			$course_id  = $request['course_id'] ?? 0;
-			$answered   = $request['answered'] ?? [];
+			$answered   = $request['answered'] ?? array();
 			$time_spend = $request['time_spend'] ?? 0;
 			$user       = learn_press_get_user( $user_id );
 			$course     = learn_press_get_course( $course_id );
+			$quiz       = learn_press_get_quiz( $item_id );
 
 			if ( ! $course ) {
 				throw new Exception( 'Course is invalid!' );
+			}
+
+			$response = apply_filters( 'lp/submit_quiz/before', $response, $quiz, $course, $answered, $time_spend, $user );
+
+			if ( $response['status'] == 'success' ) {
+				return rest_ensure_response( $response );
 			}
 
 			// Course is no required enroll
@@ -502,7 +516,6 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 				$no_required_enroll = new LP_Course_No_Required_Enroll( $course );
 
 				// Use for Review Quiz.
-				$quiz = learn_press_get_quiz( $item_id );
 
 				if ( ! $quiz ) {
 					throw new Exception( __( 'Quiz is invalid!', 'learnpress' ) );
@@ -517,13 +530,13 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 				// End
 
 				$result['status'] = LP_ITEM_COMPLETED;
-				//$result['answered']  = $result['questions'];
-				$result['attempts']  = [];
+				// $result['answered']  = $result['questions'];
+				$result['attempts']  = array();
 				$result['results']   = $result;
 				$response['status']  = 'success';
 				$response['results'] = $result;
 
-				//learn_press_setcookie( 'quiz_submit_status_' . $course_id . '_' . $item_id . '', 'completed', time() + ( 7 * DAY_IN_SECONDS ), false );
+				// learn_press_setcookie( 'quiz_submit_status_' . $course_id . '_' . $item_id . '', 'completed', time() + ( 7 * DAY_IN_SECONDS ), false );
 
 				return rest_ensure_response( $response );
 			}
@@ -613,7 +626,14 @@ class LP_REST_Users_Controller extends LP_Abstract_REST_Controller {
 			$course_id   = $request['course_id'] ?? 0;
 			$quiz_id     = $request['item_id'] ?? 0;
 			$course      = learn_press_get_course( $course_id );
-			$checked     = [];
+			$checked     = array();
+			$quiz        = learn_press_get_quiz( $quiz_id );
+
+			$response = apply_filters( 'lp/check_answer/before', $response, $question_id, $quiz, $answered, $course );
+
+			if ( $response['status'] == 'success' ) {
+				return rest_ensure_response( $response );
+			}
 
 			if ( $course->is_no_required_enroll() ) {
 				$no_required_enroll = new LP_Course_No_Required_Enroll( $course );

@@ -305,7 +305,7 @@ function learn_press_user_has_roles( $roles, $user_id = null ) {
 function learn_press_current_user_can_view_profile_section( $section, $user ) {
 	$current_user = wp_get_current_user();
 	$view         = true;
-	if ( $user->get_data( 'user_login' ) != $current_user->user_login && $section == LP()->settings->get(
+	if ( $user->get_data( 'user_login' ) != $current_user->user_login && $section == LP()->settings()->get(
 		'profile_endpoints.profile-orders',
 		'profile-orders'
 	) ) {
@@ -363,7 +363,7 @@ function learn_press_get_profile_user() {
  * Add instructor registration button to register page and admin bar
  */
 function learn_press_user_become_teacher_registration_form() {
-	if ( LP()->settings->get( 'instructor_registration' ) != 'yes' ) {
+	if ( LP()->settings()->get( 'instructor_registration' ) != 'yes' ) {
 		return;
 	}
 	?>
@@ -959,7 +959,7 @@ function learn_press_profile_tab_edit_content( $current, $tab, $user ) {
 }
 
 function learn_press_get_profile_endpoints() {
-	$endpoints = (array) LP()->settings->get( 'profile_endpoints' );
+	$endpoints = (array) LP()->settings()->get( 'profile_endpoints' );
 	if ( $tabs = LP_Profile::instance()->get_tabs() ) {
 		foreach ( $tabs as $slug => $info ) {
 			if ( empty( $endpoints[ $slug ] ) ) {

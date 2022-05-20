@@ -713,7 +713,7 @@ if ( ! class_exists( 'LP_Profile' ) ) {
 					$query['pagination'] = learn_press_paging_nav(
 						array(
 							'num_pages' => $query['num_pages'],
-							'base'      => learn_press_user_profile_link( $this->get_user_data( 'id' ), LP()->settings->get( 'profile_endpoints.profile-orders' ) ),
+							'base'      => learn_press_user_profile_link( $this->get_user_data( 'id' ), LP()->settings()->get( 'profile_endpoints.profile-orders' ) ),
 							'format'    => $GLOBALS['wp_rewrite']->using_permalinks() ? user_trailingslashit( '%#%', '' ) : '?paged=%#%',
 							'echo'      => false,
 							'paged'     => $args['paged'],
