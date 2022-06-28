@@ -1008,6 +1008,7 @@ button[data-counter] {
 		background: transparent;
 		font-size: 0;
 		text-decoration: none;
+		border: 0;
 
 		&::before {
 			font-family: "Font Awesome 5 Free";
